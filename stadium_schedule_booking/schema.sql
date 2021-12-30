@@ -1,5 +1,6 @@
 -- has admin and customer details
-DROP TABLE IF EXISTS users;
+ DROP TABLE IF EXISTS users;
+ DROP TABLE IF EXISTS sports;
 
 create table users(
     username TEXT NOT NULL UNIQUE,
@@ -10,4 +11,14 @@ create table users(
     favsports TEXT,
     admin TEXT NOT NULL
 );
+
+create table sports(
+    id VARCHAR PRIMARY KEY,
+    name TEXT UNIQUE,
+    cost INT,
+    status TEXT,
+    remarks TEXT
+);
+
+
 
