@@ -1,11 +1,4 @@
-DROP TABLE IF EXISTS admin;
-
-create table admin(
-    username TEXT NOT NULL UNIQUE,
-    emailid TEXT NOT NULL PRIMARY KEY,
-    password TEXT NOT NULL
-);
-
+-- has admin and customer details
 DROP TABLE IF EXISTS users;
 
 create table users(
@@ -14,6 +7,7 @@ create table users(
     password TEXT NOT NULL,
     firstname TEXT NOT NULL,
     lastname TEXT NOT NULL,
-    favSports TEXT NOT NULL
+    favSports TEXT,
+    admin TEXT NOT NULL
 );
 
