@@ -9,10 +9,14 @@ app.config['SECRET_KEY'] = 'stadium'
 def index():
     return render_template('index.html')
 
+def get_db_connection():
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
-#later
-# def get_db_connection():
-#     conn = sqlite3.connect('database.db')
-#     conn.row_factory = sqlite3.Row
-#     return conn
+@app.route('/login', methods=('GET', 'POST'))
+def login():
+    #get details from login page and validate
+    #according to the user(admin/customer) display the homepage
+    return render_template('login.html')
 
