@@ -7,7 +7,7 @@ create table users(
     password TEXT NOT NULL,
     firstname TEXT NOT NULL,
     lastname TEXT NOT NULL,
-    favSports TEXT,
+    favsports TEXT,
     admin TEXT NOT NULL
 );
 
