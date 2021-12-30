@@ -11,8 +11,7 @@ cur = connection.cursor()
 cur.execute("INSERT INTO users (username,emailid,password,firstname,lastname,favsports,admin) VALUES (?,?,?,?,?,?,?)", 
 ('admin1','alzaha2427@gmail.com','admin@123','Nz','sk',None,'yes'))
 
-cur.execute("INSERT INTO users (username,emailid,password,firstname,lastname,favsports,admin) VALUES (?,?,?,?,?,?,?)", 
-('admin2','jjtjasonthomas@gmail.com','admin@456','J','T',None,'yes'))
+cur.execute("INSERT INTO users (username,emailid,password,firstname,lastname,favsports,admin) VALUES (?,?,?,?,?,?,?)",('admin2','jjtjasonthomas@gmail.com','admin@456','J','T',None,'yes'))
 
 
 connection.commit()
