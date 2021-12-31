@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %}Admin Home Screen/dashboard{% endblock %}</h1>
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+          <li class="nav-item">
+              <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
+          </li>
+          </ul>
+      </div>
+    </nav>
+    <hr>
+    <div class="d-grid gap-3 col-6 mx-auto">
+      
+      <a class="btn btn-primary" data-bs-toggle="button" href="#" role="button">Add/Edit Sports Details</a>
+      <a class="btn btn-info" data-bs-toggle="button" href="{{url_for('bookinghistory')}}" role="button">View All bookings</a>
+      
+    </div>
+{% endblock %}

@@ -1,16 +1,21 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, validators
+import email_validator
 class LoginForm(FlaskForm):
-    email = StringField('Email', [validators.DataRequired(),validators.Length(min=6, max=35)])
-    password = PasswordField('Password',[validators.DataRequired(),validators.Length(min=6, max=15)])
+    email = StringField('Email', [validators.InputRequired("Please enter your email address."), validators.Email("This field requires a valid email address")])
+    password = PasswordField('Password',[validators.InputRequired()])
     submit = SubmitField('Login')
 
 class SignupForm(FlaskForm):
-    username=StringField('Username', [validators.DataRequired(),validators.Length(min=4, max=25)])
-    firstname=StringField('firstname', [validators.DataRequired(),validators.Length(min=1, max=35)])
-    lastname=StringField('lastname', [validators.DataRequired(),validators.Length(min=1, max=35)])
-    email = StringField('Email', [validators.DataRequired(),validators.Length(min=6, max=35)])
-    favsports=StringField('favsports', [validators.DataRequired(),validators.Length(min=6, max=35)])
-    password = PasswordField('Password', [validators.DataRequired(),validators.Length(min=6, max=15)])
+    username=StringField('Username', [validators.InputRequired()])
+    firstname=StringField('firstname', [validators.InputRequired()])
+    lastname=StringField('lastname', [validators.InputRequired()])
+    email = StringField('Email', [validators.InputRequired("Please enter your email address."), validators.Email("This field requires a valid email address")])
+    favsports=StringField('favsports', [validators.InputRequired()])
+    password = PasswordField('Password', [validators.InputRequired()])
     submit = SubmitField('Sign up')
+
+class ResetPasswordForm(FlaskForm):
+    email = StringField('Email', [validators.InputRequired("Please enter your email address."), validators.Email("This field requires a valid email address")])
+    submit = SubmitField('Send password reset email')
 
