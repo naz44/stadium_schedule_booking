@@ -143,7 +143,13 @@ def confirmbooking():
         result= request.form
         conn = get_db_connection()
         p = request.form.get('date')
+        slotlist = request.form.getlist('slot_list[]')
+        hc = request.form.get('cost-per-hr')
+        tc = request.form.get('form-total-cost')
         print(p)
+        print(slotlist)
+        print(hc)
+        print(tc)
 
         # conn.execute("INSERT INTO users (username,emailid,password,firstname,lastname,favsports,admin) VALUES (?,?,?,?,?,?,?)",(un,e,p,fn,ln,fs,'no'))
         # sports = conn.execute('SELECT * FROM sports').fetchall()
@@ -153,7 +159,7 @@ def confirmbooking():
         # conn.close()
         # return render_template('userhome.html', sports=sports, favsports=favsports)
 
-        return render_template('confirmbooking.html', form=form, p=p)
+        return render_template('confirmbooking.html', form=form, p=p, slotlist=slotlist, hc=hc, tc=tc)
     return render_template('login.html', form=LoginForm())
 
 
