@@ -13,7 +13,6 @@
    <script>
        var avail_json = {{availability | tojson }}
        var codes = ['10', '11', '12', '14', '15', '16', '18', '19', '20', '21', '22', '23']
-       var hc = {{ sportsdata['cost'] | tojson }}
        var count = 0
        function text(x){
            if(x==0){
@@ -104,7 +103,7 @@
 </head>
 <body>
 
-<form method="post" action="{{ url_for('confirmbooking') }}">
+<form method="post" action="{{ url_for('maintenance') }}">
 <h2><b>SELECT DATE</b></h2>
     <div class="radio date-options-container">
         <input class="radio__input" type="radio" value="{{dates[0][0]}}" name="date" id="date1" checked="checked">
@@ -180,18 +179,13 @@
               <label class="btn time-checkbox btn-outline-primary" for="23">11 PM</label>
         </div>
 <br>
-<p><b>Cost per hour: </b>Rs. <span id="hourly-cost">{{sportsdata['cost']}}</span></p>
-<p><b>Total cost: </b>Rs. <span id="total-cost">0</span></p>
-    <input type="hidden" name="cost-per-hr" id="cost-per-hr" value="0">
-    <input type="hidden" name="form-total-cost" id="form-total-cost" value="0">
-<br>
 <input type="hidden" name="sport-id" id="sport-id" value="{{sportsdata['id']}}">
 {{form.submit()}}
     </form>
 <!--<button type="submit" class="btn btn-primary">Proceed</button>-->
 
-        <script type=text/javascript>
-            document.getElementById('cost-per-hr').value = hc
+        <script type="text/javascript">
+            // document.getElementById('cost-per-hr').value = hc
             // Runs by default for today's date
             var today = {{ dates[0][0] | tojson }}
             avail_json[today].forEach((x)=>{
@@ -220,8 +214,8 @@
                             document.getElementById(x).disabled = true;
                         })
 
-                        count = 0
-                        document.getElementById("total-cost").innerText = count * hc
+                        //count = 0
+                        // document.getElementById("total-cost").innerText = count * hc
 
                     }
                     // console.log(this.value)
@@ -229,19 +223,19 @@
             }
 
             // Event Listener for calculating total - increment/decrement
-            var hourlyboxes = document.getElementsByClassName("hourly-checkbox")
-            for (var i = 0; i < hourlyboxes.length; i++) {
-                hourlyboxes[i].addEventListener('change', function() {
-                    if(this.checked){
-                        count = count+1
-                    }
-                    else{
-                        count = count-1
-                    }
-                    document.getElementById("total-cost").innerText = count * hc
-                    document.getElementById("form-total-cost").value = count * hc
-                })
-            }
+            // var hourlyboxes = document.getElementsByClassName("hourly-checkbox")
+            // for (var i = 0; i < hourlyboxes.length; i++) {
+            //     hourlyboxes[i].addEventListener('change', function() {
+            //         if(this.checked){
+            //             count = count+1
+            //         }
+            //         else{
+            //             count = count-1
+            //         }
+            //         document.getElementById("total-cost").innerText = count * hc
+            //         document.getElementById("form-total-cost").value = count * hc
+            //     })
+            // }
         </script>
 </body>
 

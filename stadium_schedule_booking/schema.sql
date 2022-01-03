@@ -1,6 +1,5 @@
 -- has admin and customer details
- DROP TABLE IF EXISTS users;
- DROP TABLE IF EXISTS sports;
+DROP TABLE IF EXISTS users;
 
 create table users(
     username TEXT NOT NULL UNIQUE,
@@ -11,14 +10,26 @@ create table users(
     favsports TEXT,
     admin TEXT NOT NULL
 );
+--has sports details
+DROP TABLE IF EXISTS sports;
 
 create table sports(
-    id VARCHAR PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     name TEXT UNIQUE,
-    cost INT,
+    cost INTEGER,
     status TEXT,
     remarks TEXT
 );
+--has booking details
+DROP TABLE IF EXISTS booking;
 
-
-
+create table booking(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sportsId INTEGER,
+    date DATETIME,
+    duration INTEGER,
+    total_cost DECIMAL(7,2),
+    customer_username TEXT,
+    code TEXT,
+    FOREIGN KEY(sportsId) REFERENCES sports(id)
+);

@@ -15,10 +15,22 @@ class SignupForm(FlaskForm):
     password = PasswordField('Password', [validators.InputRequired()])
     submit = SubmitField('Sign up')
 
-class BookingForm(FlaskForm):
-    submit = SubmitField('Proceed')
-    
-class ResetPasswordForm(FlaskForm):
+class ForgotPasswordForm(FlaskForm):
     email = StringField('Email', [validators.InputRequired("Please enter your email address."), validators.Email("This field requires a valid email address")])
     submit = SubmitField('Send password reset email')
 
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField(label='Password', validators=[
+        validators.InputRequired(),
+        validators.EqualTo('password_confirm', message='Passwords must match')
+    ])
+    password_confirm = PasswordField(label='Passwordconfirm', validators=[
+        validators.InputRequired()
+    ])
+    submit = SubmitField('Submit')
+
+class BookingForm(FlaskForm):
+    submit = SubmitField('Proceed')
+
+class EditingForm(FlaskForm):
+    submit = SubmitField('Proceed')
