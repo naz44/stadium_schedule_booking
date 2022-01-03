@@ -46,7 +46,7 @@ def login():
             conn.close()
             if user is None:
                 #abort(404)
-                flash("Invalid credentials",category='error')
+                flash("Invalid credentials",category="danger")
                 return render_template('login.html',form=form)
             session['user']=e
                 
@@ -56,10 +56,13 @@ def login():
         else:
             if user['admin'] == 'yes':
                 return render_template('adminhomepage.html')
+            #there are no favsports for admin
             favs = user['favsports']
             print(favs)
             favsports = [ i.strip().capitalize() for i in favs.split(',')]
             print(favsports)
+            session['favsports']=favsports
+            print(session['favsports'])
         return render_template('homepage.html', sports=sports, favsports=favsports)
 
     return render_template('login.html',form=form)
@@ -69,6 +72,9 @@ def logout():
     #check user login 
     if "user" in session:
         session.pop('user', None)
+        session.pop('email',None)
+        session.pop('sports',None)
+        session.pop('favsports',None)
         flash("Logged out successfully",category='success')
         return render_template('index.html')
     
@@ -187,6 +193,17 @@ def bookinghistory():
     conn.close()
     return render_template('bookinghistory.html',data=filtered)
 
+@app.route('/adminhomepage')
+def adminhomepage(): 
+    return render_template('adminhomepage.html')
+
+@app.route('/homepage')
+def homepage(): 
+    conn= get_db_connection()
+    sports=conn.execute('select * from sports').fetchall()
+    favsports=session['favsports']
+    conn.close()
+    return render_template('homepage.html', sports=sports, favsports=favsports)
 
 @app.route('/book', methods=('GET', 'POST'))
 def book():
@@ -210,7 +227,7 @@ def book():
         availability[datestr] = booking_list
     sp = sport
     sportsdata = conn.execute('SELECT * FROM sports WHERE name = ?',(sp,)).fetchone()
-
+    session['sport_id']=sportsdata['id']
     conn.close()
     return render_template('book.html', sport=sport, dates=dates, availability=availability, sportsdata=sportsdata, form=form)
 
@@ -229,15 +246,11 @@ def confirmbooking():
         print(slotlist)
         print(hc)
         print(tc)
-
-        # conn.execute("INSERT INTO users (username,emailid,password,firstname,lastname,favsports,admin) VALUES (?,?,?,?,?,?,?)",(un,e,p,fn,ln,fs,'no'))
-        # sports = conn.execute('SELECT * FROM sports').fetchall()
-        # flash("Thank you for registering")
-        # favsports = [i.strip().capitalize() for i in fs.split(',')]
+        # conn = get_db_connection()
+        # conn.execute("INSERT INTO booking (sportsId,date,duration,total_cost,customer_username,code) VALUES (?,?,?,?,?,?)",(int(session['sport_id'],,,,)))
+        # flash("Thank you for Booking",category='success')
         # conn.commit()
         # conn.close()
-        # return render_template('userhome.html', sports=sports, favsports=favsports)
-
         return render_template('confirmbooking.html', form=form, p=p, slotlist=slotlist, hc=hc, tc=tc)
     return render_template('login.html', form=LoginForm())
 
@@ -275,8 +288,8 @@ def edit():
 
     sportsdata = conn.execute('SELECT * FROM sports WHERE name = ?',(sp,)).fetchone()
     session['edit_id']= sportsdata['id']
-    print(session['edit_id'])
-    print(type(session['edit_id']))
+    # print(session['edit_id'])
+    # print(type(session['edit_id']))
     conn.close()
     return render_template('edit.html', sport=sport, dates=dates, availability=availability, sportsdata=sportsdata, form=form)
 
@@ -296,6 +309,7 @@ def maintenance():
         print(type(s))
         print(type(','.join(slotlist)))
         conn.execute('INSERT INTO booking (sportsId,date,duration,total_cost,customer_username,code) values (?,?,?,?,?,?)',(int(session['edit_id']),p,len(slotlist),0,'admin',','.join(slotlist)))
+        session.pop('edit_id',None)
         conn.commit()
         conn.close()
         flash("Details have been updated",category='success')
