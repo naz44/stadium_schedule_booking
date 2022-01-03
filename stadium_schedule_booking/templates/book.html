@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SELECT THE TIME</title>
+    <link rel="shortcut icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.js" ></script>
+
+   <script>
+       var avail_json = {{availability | tojson }}
+       var codes = ['10', '11', '12', '14', '15', '16', '18', '19', '20', '21', '22', '23']
+       var hc = {{ sportsdata['cost'] | tojson }}
+       var count = 0
+       function text(x){
+           if(x==0){
+                document.getElementById("timeslot1").style.display="block";
+                document.getElementById("timeslot2").style.display="none";
+                document.getElementById("timeslot3").style.display="none";
+                document.getElementById("timeslot4").style.display="none";
+           }
+           else if(x==1){
+                document.getElementById("timeslot1").style.display="none";
+                document.getElementById("timeslot2").style.display="block";
+                document.getElementById("timeslot3").style.display="none";
+                document.getElementById("timeslot4").style.display="none";
+                }
+           else if(x==2){
+                document.getElementById("timeslot1").style.display="none";
+                document.getElementById("timeslot2").style.display="none";
+                document.getElementById("timeslot3").style.display="block";
+                document.getElementById("timeslot4").style.display="none";
+           }
+           else{
+                document.getElementById("timeslot1").style.display="none";
+                document.getElementById("timeslot2").style.display="none";
+                document.getElementById("timeslot3").style.display="none";
+                document.getElementById("timeslot4").style.display="block";
+            }
+
+           return;
+       }
+   </script>
+<style>
+    body{
+        margin:20px;
+    }
+    .radio{
+        display: block;
+        border-radius: 0px;
+    }
+    .radio__input{
+        display: none;
+    }
+    .radio__label{
+        padding: 8px 14px;
+        font-size: 14px;
+        font-family: sans-serif;
+        color: #ffffff;
+        background: #009578;
+        cursor: pointer;
+        transition: background 0.1s;
+        box-shadow: 0 0 5px  rgba(0, 0, 0, 0.25);
+    }
+    .radio__label:not(:last-of-type){
+        border-right: 1px solid #006B56;
+    }
+    .radio__input:checked + .radio__label{
+        background: #006B56;
+    }
+    .timelabel{
+        margin-left: 10px;
+    }
+    #timeslot2, #timeslot3, #timeslot4{
+        display:none;
+    }
+    .timeslot{
+        height:30px;
+    }
+
+    .date-option{
+        padding: 26px 27px;
+    }
+
+    .date-options-container{
+        margin-top: 30px;
+        margin-block: 35px;
+    }
+
+    .timeslots{
+        margin-bottom: 20px;
+    }
+    input[type=checkbox]{
+        display:none;
+    }
+
+    .time-checkbox{
+        margin-left: 15px;
+    }
+</style>
+</head>
+<body>
+
+<form method="post" action="{{ url_for('confirmbooking') }}">
+<h2><b>SELECT DATE</b></h2>
+    <div class="radio date-options-container">
+        <input class="radio__input" type="radio" value="{{dates[0][0]}}" name="date" id="date1" checked="checked">
+        <label class="radio__label date-option" for="date1">{{dates[0][0]}}</label>
+        <input class="radio__input" type="radio" value="{{dates[1][0]}}" name="date" id="date2">
+        <label class="radio__label date-option" for="date2">{{dates[1][0]}}</label>
+        <input class="radio__input" type="radio" value="{{dates[2][0]}}" name="date" id="date3">
+        <label class="radio__label date-option" for="date3">{{dates[2][0]}}</label>
+        <input class="radio__input" type="radio" value="{{dates[3][0]}}" name="date" id="date4">
+        <label class="radio__label date-option" for="date4">{{dates[3][0]}}</label>
+        <input class="radio__input" type="radio" value="{{dates[4][0]}}" name="date" id="date5">
+        <label class="radio__label date-option" for="date5">{{dates[4][0]}}</label>
+        <input class="radio__input" type="radio" value="{{dates[5][0]}}" name="date" id="date6">
+        <label class="radio__label date-option" for="date6">{{dates[5][0]}}</label>
+        <input class="radio__input" type="radio" value="{{dates[6][0]}}" name="date" id="date7">
+        <label class="radio__label date-option" for="date7">{{dates[6][0]}}</label>
+    </div>
+
+<h2><b>SELECT TIME</b></h2>
+    <div class="radio timeslots">
+        <input class="radio__input" type="radio" value="var1"  onclick= "text(0)" name="rradio" id="radio1" checked="checked">
+        <label class="radio__label timelabel" for="radio1">10:00 AM 1:00 PM</label>
+        <input class="radio__input" type="radio" value="var2" onclick= "text(1)" name="rradio" id="radio2">
+        <label class="radio__label timelabel" for="radio2">2:00 PM 5:00 PM</label>
+        <input class="radio__input" type="radio" value="var3" onclick= "text(2)" name="rradio" id="radio3">
+        <label class="radio__label timelabel" for="radio3">6:00 PM 9:00 PM</label>
+        <input class="radio__input" type="radio" value="var4" onclick= "text(3)" name="rradio" id="radio4">
+        <label class="radio__label timelabel" for="radio4">9:00 PM 12:00 PM</label>
+    </div>
+
+    <br>
+        <div class="hourly-slot" id="timeslot1">
+            <input type="checkbox" class="btn-check hourly-checkbox" id="10" autocomplete="off">
+              <label class="btn time-checkbox btn-outline-primary" for="10">10 AM</label>
+
+              <input type="checkbox" class="btn-check hourly-checkbox" id="11" autocomplete="off">
+              <label class="btn time-checkbox btn-outline-primary" for="11">11 AM</label>
+
+              <input type="checkbox" class="btn-check hourly-checkbox" id="12" autocomplete="off">
+              <label class="btn time-checkbox btn-outline-primary" for="12">12 PM</label>
+        </div>
+
+        <div class="hourly-slot" id="timeslot2">
+            <input type="checkbox" class="btn-check hourly-checkbox" id="14" autocomplete="off">
+              <label class="btn time-checkbox btn-outline-primary" for="14">2 PM</label>
+
+              <input type="checkbox" class="btn-check hourly-checkbox" id="15" autocomplete="off">
+              <label class="btn time-checkbox btn-outline-primary" for="15">3 PM</label>
+
+              <input type="checkbox" class="btn-check hourly-checkbox" id="16" autocomplete="off">
+              <label class="btn time-checkbox btn-outline-primary" for="16">4 PM</label>
+        </div>
+
+        <div class="hourly-slot" id="timeslot3">
+            <input type="checkbox" class="btn-check hourly-checkbox" id="18" autocomplete="off">
+              <label class="btn time-checkbox btn-outline-primary" for="18">6 PM</label>
+
+              <input type="checkbox" class="btn-check hourly-checkbox" id="19" autocomplete="off">
+              <label class="btn time-checkbox btn-outline-primary" for="19">7 PM</label>
+
+              <input type="checkbox" class="btn-check hourly-checkbox" id="20" autocomplete="off">
+              <label class="btn time-checkbox btn-outline-primary" for="20">8 PM</label>
+        </div>
+
+        <div class="hourly-slot" id="timeslot4">
+            <input type="checkbox" class="btn-check hourly-checkbox" id="21" autocomplete="off">
+              <label class="btn time-checkbox btn-outline-primary" for="21">9 PM</label>
+
+              <input type="checkbox" class="btn-check hourly-checkbox" id="22" autocomplete="off">
+              <label class="btn time-checkbox btn-outline-primary" for="22">10 PM</label>
+
+              <input type="checkbox" class="btn-check hourly-checkbox" id="23" autocomplete="off">
+              <label class="btn time-checkbox btn-outline-primary" for="23">11 PM</label>
+        </div>
+<br>
+<p><b>Cost per hour: </b>Rs. <span id="hourly-cost">{{sportsdata['cost']}}</span></p>
+<p><b>Total cost: </b>Rs. <span id="total-cost">0</span></p>
+<br>
+{{form.submit()}}
+    </form>
+<!--<button type="submit" class="btn btn-primary">Proceed</button>-->
+
+        <script type=text/javascript>
+            // Runs by default for today's date
+            var today = {{ dates[0][0] | tojson }}
+            avail_json[today].forEach((x)=>{
+                document.getElementById(x).disabled = true;
+            })
+
+            // Add Event Listener to run the code once date is changed
+            var rad = document.getElementsByName("date");
+            var prev = null;
+            for (var i = 0; i < rad.length; i++) {
+                rad[i].addEventListener('change', function() {
+                    // (prev) ? console.log(prev.value): null;
+                    if (this !== prev) {
+                        prev = this;
+                        var date = document.querySelector(`[for=${this.id}]`).innerText;
+                        console.log(date)
+                        console.log(avail_json[date])
+
+                        codes.forEach((x)=>{
+                            document.getElementById(x).disabled = false;
+                            document.getElementById(x).checked = false;
+                        })
+
+                        avail_json[date].forEach((x)=>{
+                            document.getElementById(x).disabled = true;
+                        })
+
+                        count = 0
+                        document.getElementById("total-cost").innerText = count * hc
+
+                    }
+                    // console.log(this.value)
+                });
+            }
+
+            // Event Listener for calculating total - increment/decrement
+            var hourlyboxes = document.getElementsByClassName("hourly-checkbox")
+            for (var i = 0; i < hourlyboxes.length; i++) {
+                hourlyboxes[i].addEventListener('change', function() {
+                    if(this.checked){
+                        count = count+1
+                    }
+                    else{
+                        count = count-1
+                    }
+                    document.getElementById("total-cost").innerText = count * hc
+                })
+            }
+        </script>
+</body>
+
+</html>
