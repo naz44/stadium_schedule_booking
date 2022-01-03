@@ -1,10 +1,20 @@
 .container{
-    margin-top: 8%;
+    margin-top:3%;
     row-gap: 10%;
 }
-.col-md-4{
-    margin: 12px;
+.col-md-4 .row{
+    margin: 8px;
 }
+
+.card-img, .card-img-top{
+    width: 344px;
+    height: 192px;
+}
+
+.card{
+    padding-top:12px;
+}
+
 .inner{
     overflow: hidden;
 }
