@@ -3,12 +3,15 @@ import sqlite3, os
 from werkzeug.exceptions import abort
 from datetime import date
 import datetime
+from pytz import timezone
 import hashlib
 #from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, SignupForm, ForgotPasswordForm, ResetPasswordForm, BookingForm, EditingForm, ChangePrices
 from flask_mail import Mail, Message
 from random import randint
 from creds import email_password
+from timecal import timecal
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'stadium'
 
@@ -33,8 +36,9 @@ def get_db_connection():
     return conn
 
 @app.route('/viewmaintenance')
-
 def viewmaintenance():
+    if session['usertype'] == 'user':
+        return "Access Denied!!"
     conn = get_db_connection()
     #displays all bookings in desc order of date
     filtered = conn.execute('SELECT * from maintenance').fetchall()
@@ -61,6 +65,10 @@ def login():
                 return render_template('login.html',form=form)
             session['user']=e
             session['username'] = user['username']
+            if user['admin'] == 'yes':
+                session['usertype'] = 'admin'
+            else:
+                session['usertype'] = 'user'
         except:
             flash("Couldnot establish connection with the database, please try after sometime",category='warning')
             return render_template('index.html')
@@ -101,18 +109,22 @@ def updatebooking():
     sp_name = request.form.get('sp_name')
     slotlist = request.form.getlist('slotlist[]')
     code = ",".join(slotlist)
+    slotstr = timecal(slotlist)
+    print(slotstr)
     print("HERE")
     print(session['user'])
-    msg = Message(subject='Booking Cofirmed!', sender='play.arena35@gmail.com', recipients=[session['user']])
-    msg.body = str(f"Your booking is confirmed.\nSport: {sp_name}\nTime: {code}\nTotal Cost: {tc}")
-    msg.html = render_template('confirmation.html', dt=dt, slotlist=slotlist, hc=hc, tc=tc, sp=sp, sp_name=sp_name,
-                               cnf=False)
-    mail.send(msg)
 
     conn = get_db_connection()
     conn.execute("INSERT INTO booking (sportsId,date,duration,'total cost','customer username',code) VALUES (?,?,?,?,?,?)",(sp,dt,len(slotlist),tc,session['username'],code))
     conn.commit()
     conn.close()
+    msg = Message(subject='Booking Confirmed!', sender='play.arena35@gmail.com', recipients=[session['user']])
+    msg.body = str(f"Your booking is confirmed.\nSport: {sp_name}\nTime: {slotstr}\nTotal Cost: {tc}")
+
+    msg.html = render_template('confirmation.html', slotlist=slotlist, slotstr=slotstr, dt=dt, hc=hc, tc=tc, sp=sp,
+                               sp_name=sp_name,
+                               cnf=False)
+    mail.send(msg)
     return ("nothing")
 
 @app.route('/logout', methods=('GET', 'POST'))
@@ -228,14 +240,26 @@ def resetpassword():
 
 @app.route('/bookinghistory')
 def bookinghistory():
+    if session['usertype'] == 'user':
+        return "Access Denied!!"
     conn = get_db_connection()
     #displays all bookings in desc order of date
-    filtered = conn.execute('SELECT b."customer username",s.name,b.date,b.duration,b."total cost" FROM booking b,sports s where b.sportsid=s.id order by b.date desc').fetchall()
+    filtered = conn.execute('SELECT b."customer username",s.name,b.date,b.duration,b."total cost",b.code FROM booking b,sports s where b.sportsid=s.id order by b.date desc').fetchall()
     conn.close()
     return render_template('bookinghistory.html',data=filtered)
 
+@app.route('/userbookinghistory')
+def userbookinghistory():
+    conn = get_db_connection()
+    #displays all bookings in desc order of date
+    filtered = conn.execute('SELECT b."customer username",s.name,b.date,b.duration,b."total cost",b.code FROM booking b,sports s where b.sportsid=s.id and  b."customer username" = ? order by b.date desc ', (session['username'],)).fetchall()
+    conn.close()
+    return render_template('bookings.html',data=filtered)
+
 @app.route('/adminhomepage')
-def adminhomepage(): 
+def adminhomepage():
+    if session['usertype'] == 'user':
+        return "Access Denied!!"
     return render_template('adminhomepage.html')
 
 @app.route('/homepage')
@@ -259,6 +283,7 @@ def book():
     for i in range(7):
         dt = today+datetime.timedelta(days=i)
         datestr = str(dt.strftime("%d/%m/%Y"))
+
         dates.append([datestr, dt.strftime("%A") if i>0 else "Today"])
         #print(datestr)
         cur_date_bookings = conn.execute('SELECT code FROM booking WHERE sportsid = (SELECT id from sports WHERE name = ?) and date = ?', (sport, datestr)).fetchall()
@@ -272,8 +297,9 @@ def book():
     sp = sport
     sportsdata = conn.execute('SELECT * FROM sports WHERE name = ?',(sp,)).fetchone()
     session['sport_id']=sportsdata['id']
+    chr = str(datetime.datetime.now(timezone('Asia/Kolkata')).hour)
     conn.close()
-    return render_template('book.html', sport=sport, dates=dates, availability=availability, sportsdata=sportsdata, form=form)
+    return render_template('book.html', chr=chr, sport=sport, dates=dates, availability=availability, sportsdata=sportsdata, form=form)
 
 @app.route('/confirmbooking', methods=('GET', 'POST'))
 def confirmbooking():
@@ -286,12 +312,17 @@ def confirmbooking():
         tc = request.form.get('form-total-cost')
         sp = request.form.get('sport-id')
         sp_name = request.form.get('sport-name')
-        return render_template('confirmation.html', form=form, dt=dt, slotlist=slotlist, hc=hc, tc=tc, sp=sp, sp_name=sp_name,cnf=True)
+
+        slotstr = timecal(slotlist)
+        print(slotstr)
+        return render_template('confirmation.html', form=form, dt=dt, slotstr=slotstr, slotlist=slotlist, hc=hc, tc=tc, sp=sp, sp_name=sp_name,cnf=True)
     return render_template('login.html', form=LoginForm())
 
 
 @app.route('/editsports', methods=('GET', 'POST'))
 def editsports():
+    if session['usertype'] == 'user':
+        return "Access Denied!!"
     conn = get_db_connection()
     sports = conn.execute("select * from sports").fetchall()
     # print(sports)
@@ -304,6 +335,8 @@ def editsports():
 
 @app.route('/edit', methods=('GET', 'POST'))
 def edit():
+    if session['usertype'] == 'user':
+        return "Access Denied!!"
     form = EditingForm()
     sport = request.args.get('sport')
     print(sport)
@@ -332,7 +365,9 @@ def edit():
     # print(session['edit_id'])
     # print(type(session['edit_id']))
     conn.close()
-    return render_template('edit.html', sport=sport, dates=dates, availability=availability, sportsdata=sportsdata, form=form)
+    chr = str(datetime.datetime.now(timezone('Asia/Kolkata')).hour)
+
+    return render_template('edit.html', chr=chr, sport=sport, dates=dates, availability=availability, sportsdata=sportsdata, form=form)
 
 
 @app.route('/maintenance', methods=('GET', 'POST'))
@@ -361,6 +396,8 @@ def maintenance():
 
 @app.route('/changeprices', methods=['GET','POST'])
 def changeprices():
+    if session['usertype'] == 'user':
+        return "Access Denied!!"
     # fetches all the sports from sports table and displays on changeprices.html. After submit, it updates the the price.
     form = ChangePrices()
     if form.is_submitted():
@@ -378,6 +415,50 @@ def changeprices():
     conn.close()
     print(query)
     return render_template("changeprices.html",query=query, form = form)
+
+@app.template_global()
+def timecal(slots):
+    slots = [int(i) for i in slots]
+    start = [slots[0]]
+    end = []
+    st = -1
+    ed = -1
+    flag = False
+    for i in range(len(slots) - 1):
+        if ed == -1:
+            st = slots[i]
+            ed = slots[i]
+        if slots[i] + 1 == slots[i + 1]:
+            ed = slots[i + 1]
+        else:
+            end.append(slots[i] + 1 if slots[i] + 1 != 24 else '00')
+            start.append(slots[i + 1])
+            ed = -1
+
+    if slots[-1] == ed:
+        end.append(slots[-1] + 1)
+
+    if (slots[-1] == start[-1]):
+        end.append(slots[-1] + 1 if slots[-1] != 23 else '00')
+
+    if len(end) == 0:
+        flag = True
+        end.append(slots[-1])
+    print(start)
+    print(end)
+
+    bookings = []
+
+    if not flag:
+        for i in range(len(end)):
+            bookings.append(f"{start[i]}:00 - {end[i]}:00")
+        # bookings.append(f"{start[len(start)-1]} - {start[len(start)-1]+1}")
+    else:
+        for i in range(len(end)):
+            bookings.append(f"{start[i]}:00 - {end[i] + 1}:00")
+    return ", ".join(bookings)
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

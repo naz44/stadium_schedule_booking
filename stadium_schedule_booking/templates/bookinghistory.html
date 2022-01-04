@@ -157,6 +157,7 @@ table.table td a:hover {
 						<th>Sports</th>
 						<th>Date</th>
                         <th>Total duration(in hrs)</th>
+						<th>Time</th>
 						<th>Total Cost(in Rs)</th>
 					</tr>
 				</thead>
@@ -167,7 +168,9 @@ table.table td a:hover {
 						<td>{{row[1]}}</td>
 						<td>{{row[2]}}</td>
 						<td>{{row[3]}}</td>
+						<td>{{timecal(row[5].split(','))}}</td>
 						<td>{{row[4]}}</td>
+
 						<!-- <td>{{row[5]}}</td> -->
 					</tr>
 					{% endfor %}

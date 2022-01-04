@@ -96,6 +96,7 @@ body {
 </head>
 <body>
 <div>
+    {% if cnf %}
     <nav class="navbar navbar-expand-md navbar-light bg-light">
 	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
@@ -107,6 +108,9 @@ body {
 				<li class="nav-item">
 					<a class="nav-link" href="{{url_for('userhome')}}"><h6>Goto Home</h6></a>
 				</li>
+                    <li class="nav-item">
+					<a class="nav-link" href="{{url_for('userbookinghistory')}}"><h6>Bookings</h6></a>
+				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="{{url_for('logout')}}"><h6>Logout</h6></a>
 				</li>
@@ -115,7 +119,7 @@ body {
 		</ul>
 	</div>
 </nav>
-
+{% endif %}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
         <tr>
             <td align="center" style="background-color: #eeeeee;" bgcolor="#eeeeee">
@@ -140,7 +144,7 @@ body {
                                             </tr>
                                             <tr>
                                                 <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;"> Time </td>
-                                                <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;"> {{",".join(slotlist)}} </td>
+                                                <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;"> {{slotstr}} </td>
                                             </tr>
 											<tr>
                                                 <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;"> Cost per hr:  </td>
@@ -239,7 +243,7 @@ body {
 <!--                    <a class="nav-link" href="{{url_for('userhome')}}" role="button">OK</a>-->
 <!--                </button>-->
 <!--                <a class="nav-link" href="{{url_for('userhome')}}" role="button">OK</a>-->
-                <a class="btn btn-primary" data-bs-toggle="button" onclick="$('#modal_id').modal('hide');" href="{{url_for('userhome')}}" role="button">OK</a>
+                <a class="btn btn-primary" data-bs-toggle="button" onclick="$('#modal_id').modal('hide');" href="{{url_for('userbookinghistory')}}" role="button">OK</a>
 
 			</div>
 		</div>

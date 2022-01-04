@@ -120,6 +120,9 @@
 				<li class="nav-item">
 					<a class="nav-link" href="{{url_for('userhome')}}"><h6>Goto Home</h6></a>
 				</li>
+                    <li class="nav-item">
+					<a class="nav-link" href="{{url_for('userbookinghistory')}}"><h6>Bookings</h6></a>
+				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="{{url_for('logout')}}"><h6>Logout</h6></a>
 				</li>
@@ -227,6 +230,11 @@
 
             document.getElementById('cost-per-hr').value = hc
             // Runs by default for today's date
+            codes.forEach((x)=>{
+                if(x <= {{chr}}){
+                    document.getElementById(x).disabled = true;
+                }
+            })
             var today = {{ dates[0][0] | tojson }}
             avail_json[today].forEach((x)=>{
                 document.getElementById(x).disabled = true;

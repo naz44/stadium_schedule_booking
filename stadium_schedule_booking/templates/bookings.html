@@ -28,7 +28,7 @@ body {
 	min-width: 1000px;
 	box-shadow: 0 1px 1px rgba(0,0,0,.05);
 }
-.table-title {        
+.table-title {
 	padding-bottom: 15px;
 	background: #435d7d;
 	color: #fff;
@@ -63,7 +63,7 @@ table.table th i {
 	font-size: 13px;
 	margin: 0 5px;
 	cursor: pointer;
-}	
+}
 table.table td:last-child i {
 	opacity: 0.9;
 	font-size: 22px;
@@ -98,11 +98,11 @@ table.table td a:hover {
 }
 .pagination li a:hover {
 	color: #666;
-}	
+}
 .pagination li.active a, .pagination li.active a.page-link {
 	background: #03A9F4;
 }
-.pagination li.active a:hover {        
+.pagination li.active a:hover {
 	background: #0397d6;
 }
 .pagination li.disabled i {
@@ -116,7 +116,7 @@ table.table td a:hover {
 	float: left;
 	margin-top: 10px;
 	font-size: 13px;
-}    
+}
 
 </style>
 </head>
@@ -126,10 +126,16 @@ table.table td a:hover {
 	</button>
 	<div class="collapse navbar-collapse" id="navbarNav">
 		<ul class="navbar-nav">
-		<li class="nav-item">
-			<a class="nav-link" href="{{url_for('logout')}}"><h5>Logout</h5></a>
-			<a class="nav-link" href="{{url_for('adminhomepage')}}"><h5>Go Home</h5></a>
-		</li>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav">
+				<li class="nav-item">
+					<a class="nav-link" href="{{url_for('userhome')}}"><h6>Goto Home</h6></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{url_for('logout')}}"><h6>Logout</h6></a>
+				</li>
+				</ul>
+			</div>
 		</ul>
 	</div>
 </nav>
@@ -140,37 +146,36 @@ table.table td a:hover {
 			<div class="table-title">
 				<div class="row ">
 					<div class="col-sm-6">
-						<h2><b>Maintenace History</b></h2>
+						<h2><b>Booking History</b></h2>
 					</div>
 				</div>
 			</div>
 			<table class="table table-striped table-hover">
 				<thead>
 					<tr>
-						<th>ID</th>
-						<th>Sports ID</th>
+						<th>Username</th>
+						<th>Sports</th>
 						<th>Date</th>
                         <th>Total duration(in hrs)</th>
-						<th>Name</th>
-                        <th>Time</th>
-                        <th>Comment</th>
+						<th>Time</th>
+						<th>Total Cost(in Rs)</th>
 					</tr>
 				</thead>
 				<tbody>
-					{% for row in data %}    
+					{% for row in data %}
 					<tr>
 						<td>{{row[0]}}</td>
 						<td>{{row[1]}}</td>
 						<td>{{row[2]}}</td>
 						<td>{{row[3]}}</td>
+						<td>{{timecal(row[5].split(','))}}</td>
 						<td>{{row[4]}}</td>
-                        <td>{{timecal(row[5].split(','))}}</td>
-                        <td>{{row[6]}}</td>
+
 						<!-- <td>{{row[5]}}</td> -->
 					</tr>
 					{% endfor %}
 					<!-- <tr>
-						
+
 						<td>Thomas Hardy</td>
 						<td>thomashardy@mail.com</td>
 						<td>Cricket</td>
@@ -201,7 +206,7 @@ table.table td a:hover {
 						<td>9651190562</td>
                         <td>12:00 - 13:00</td>
                         <td>650</td>
-					</tr>					
+					</tr>
 					<tr>
 						<td>Martin Blank</td>
 						<td>martinblank@mail.com</td>
@@ -212,7 +217,6 @@ table.table td a:hover {
 					</tr>  -->
 				</tbody>
 			</table>
-			
 			<div class="clearfix">
 				<div class="hint-text">Showing all the entries</div>
 				<!-- <ul class="pagination">
@@ -226,7 +230,7 @@ table.table td a:hover {
 				</ul> -->
 			</div>
 		</div>
-	</div>        
+	</div>
 </div>
 
 </body>
