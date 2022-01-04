@@ -1,2 +1,2 @@
 Play Arena Schedule Booking System
-(--Book your arena and enjoy)
+(--Book your arena)
