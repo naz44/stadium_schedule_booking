@@ -3,6 +3,7 @@ import sqlite3
 from werkzeug.exceptions import abort
 from datetime import date
 import datetime
+import hashlib
 #from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, SignupForm, ForgotPasswordForm, ResetPasswordForm, BookingForm, EditingForm
 from flask_mail import Mail, Message
@@ -40,9 +41,8 @@ def login():
             conn = get_db_connection()
             p = request.form.get('password')
             e = request.form.get('email')
-            user = conn.execute('SELECT * FROM users WHERE emailid = ? and password= ?',(e,p)).fetchone()
+            user = conn.execute('SELECT * FROM users WHERE emailid = ? and password= ?',(e,str(hashlib.md5(p.encode()).hexdigest()))).fetchone()
             sports = conn.execute('SELECT * FROM sports').fetchall()
-            #check= check_password_hash(user['password'],p)
             conn.close()
             if user is None:
                 #abort(404)
@@ -100,7 +100,7 @@ def register():
             ln= request.form.get('lastname')
             fs= request.form.get('favsports')
             un= request.form.get('username')
-            conn.execute("INSERT INTO users (username,emailid,password,firstname,lastname,favsports,admin) VALUES (?,?,?,?,?,?,?)",(un,e,p,fn,ln,fs,'no'))
+            conn.execute("INSERT INTO users (username,emailid,password,firstname,lastname,favsports,admin) VALUES (?,?,?,?,?,?,?)",(un,e,str(hashlib.md5(p.encode()).hexdigest()),fn,ln,fs,'no'))
             sports = conn.execute('SELECT * FROM sports').fetchall()
             flash("Thank you for registering",category='success')
             favsports = [i.strip().capitalize() for i in fs.split(',')]
@@ -167,7 +167,7 @@ def resetpassword():
             confirmPassword = request.form.get('password_confirm')
             if confirmPassword == password and password != "":
                 #update the table 
-                conn.execute('UPDATE users SET password = ? WHERE emailid = ?',(password,session['email']))
+                conn.execute('UPDATE users SET password = ? WHERE emailid = ?',(str(hashlib.md5(password.encode()).hexdigest()),session['email']))
                 # flash('Password reset done successfully.',category='success')
                 # return redirect(url_for("login"))
             elif password == "" and confirmPassword == "":
@@ -246,11 +246,6 @@ def confirmbooking():
         print(slotlist)
         print(hc)
         print(tc)
-        # conn = get_db_connection()
-        # conn.execute("INSERT INTO booking (sportsId,date,duration,total_cost,customer_username,code) VALUES (?,?,?,?,?,?)",(int(session['sport_id'],,,,)))
-        # flash("Thank you for Booking",category='success')
-        # conn.commit()
-        # conn.close()
         return render_template('confirmbooking.html', form=form, p=p, slotlist=slotlist, hc=hc, tc=tc)
     return render_template('login.html', form=LoginForm())
 
