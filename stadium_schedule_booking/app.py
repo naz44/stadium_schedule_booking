@@ -298,8 +298,9 @@ def book():
     sportsdata = conn.execute('SELECT * FROM sports WHERE name = ?',(sp,)).fetchone()
     session['sport_id']=sportsdata['id']
     chr = str(datetime.datetime.now(timezone('Asia/Kolkata')).hour)
+    cur_dt = today.strftime("%d/%m/%Y")
     conn.close()
-    return render_template('book.html', chr=chr, sport=sport, dates=dates, availability=availability, sportsdata=sportsdata, form=form)
+    return render_template('book.html', cur_dt=cur_dt, chr=chr, sport=sport, dates=dates, availability=availability, sportsdata=sportsdata, form=form)
 
 @app.route('/confirmbooking', methods=('GET', 'POST'))
 def confirmbooking():
@@ -366,8 +367,9 @@ def edit():
     # print(type(session['edit_id']))
     conn.close()
     chr = str(datetime.datetime.now(timezone('Asia/Kolkata')).hour)
+    cur_dt = today.strftime("%d/%m/%Y")
 
-    return render_template('edit.html', chr=chr, sport=sport, dates=dates, availability=availability, sportsdata=sportsdata, form=form)
+    return render_template('edit.html', cur_dt=cur_dt, chr=chr, sport=sport, dates=dates, availability=availability, sportsdata=sportsdata, form=form)
 
 
 @app.route('/maintenance', methods=('GET', 'POST'))

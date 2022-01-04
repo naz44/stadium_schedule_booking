@@ -241,6 +241,7 @@
             })
 
 
+
             // Add Event Listener to run the code once date is changed
             var rad = document.getElementsByName("date");
             var prev = null;
@@ -258,9 +259,17 @@
                             document.getElementById(x).checked = false;
                         })
 
+
                         avail_json[date].forEach((x)=>{
                             document.getElementById(x).disabled = true;
                         })
+                        if(date == {{cur_dt|tojson}}){
+                            codes.forEach((x)=>{
+                                if(x <= {{chr}}){
+                                    document.getElementById(x).disabled = true;
+                                }
+                            })
+                        }
 
                         count = 0
                         document.getElementById("total-cost").innerText = count * hc

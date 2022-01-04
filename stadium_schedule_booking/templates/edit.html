@@ -257,6 +257,13 @@
                         avail_json[date].forEach((x)=>{
                             document.getElementById(x).disabled = true;
                         })
+                        if(date == {{cur_dt|tojson}}){
+                            codes.forEach((x)=>{
+                                if(x <= {{chr}}){
+                                    document.getElementById(x).disabled = true;
+                                }
+                            })
+                        }
 
                         count = 0
 
