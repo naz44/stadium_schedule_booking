@@ -14,7 +14,28 @@
 <!--</head>-->
 <!--<body>-->
 {% block content %}
-        <link rel="stylesheet" href="./static/css/cards.css">
+    <link rel="stylesheet" href="./static/css/cards.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+         .material-icons {
+            display: inline-flex;
+            vertical-align: middle;
+            font-size: 18px !important;
+        }
+        div.card-body div{
+            margin-bottom:12px;
+        }
+        .sport-icon{
+            margin-bottom:12px;
+        }
+        .neg-left-mg{
+            margin-left:-16px;
+        }
+        .neg-right-mg{
+            margin-right:-16px;
+        }
+    </style>
+
     <div class="container">
         <div class="row">
             <h2>Favorites</h2>
@@ -28,9 +49,24 @@
 
                 <div class="card-body text-center">
                   <h5 class="card-title">{{ sport }}</h5>
-                  <i class="fas fa-volleyball-ball"></i>
-                  <i class="fas fa-football-ball"></i>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    {% if sport[1] in ['Badminton', 'Archery'] %}
+                        <img class="sport-icon" style="width:18px;" src="./static/images/sports_{{sport[1]}}.png">
+                    {% else %}
+                        <i class="material-icons sport-icon">sports_{{sport.lower()}}</i>
+                    {% endif %}
+
+                  <div style="text-align:left;">
+                    <i class="material-icons neg-left-mg">groups</i><font size=4 color="green" face="times new roman"><b> {{sp_limit[sport]}} players</b></font>
+                    <span class="neg-right-mg" style="float:right;">
+                      <i class="material-icons">health_and_safety</i><font size=4  color="black" face="times new roman"><b> Safe & Hygiene</b></font>
+                    </span>
+                </div>
+                <div style="text-align:left;">
+                  <i class="material-icons neg-left-mg">local_parking</i><font size=4 color="green" face="times new roman"><b> Parking</b></font>
+                  <span class="neg-right-mg" style="float:right;">
+                    <i class="material-icons">restaurant</i><font size=4  color="black" face="times new roman"><b> Food</b></font>
+                  </span>
+              </div>
                   <a href="/book?sport={{sport}}" class="btn btn-success">Book</a>
                 </div>
               </div>
@@ -56,9 +92,24 @@
 
                 <div class="card-body text-center">
                   <h5 class="card-title">{{ sport[1] }}</h5>
-                  <i class="fas fa-volleyball-ball"></i>
-                  <i class="fas fa-football-ball"></i>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    {% if sport[1] in ['Badminton', 'Archery'] %}
+                        <img class="sport-icon" style="width:18px;" src="./static/images/sports_{{sport[1]}}.png">
+                    {% else %}
+                        <i class="material-icons sport-icon">sports_{{sport[1].lower()}}</i>
+                    {% endif %}
+
+                  <div style="text-align:left;">
+                    <i class="material-icons neg-left-mg">groups</i><font size=4 color="green" face="times new roman"><b> {{sp_limit[sport[1]]}} players</b></font>
+                    <span class="neg-right-mg" style="float:right;">
+                      <i class="material-icons">health_and_safety</i><font size=4  color="black" face="times new roman"><b> Safe & Hygiene</b></font>
+                    </span>
+                </div>
+                <div style="text-align:left;">
+                  <i class="material-icons neg-left-mg">local_parking</i><font size=4 color="green" face="times new roman"><b> Parking</b></font>
+                  <span class="neg-right-mg" style="float:right;">
+                    <i class="material-icons">restaurant</i><font size=4  color="black" face="times new roman"><b> Food</b></font>
+                  </span>
+              </div>
                   <a href="/book?sport={{sport[1]}}" class="btn btn-success">Book</a>
                 </div>
               </div>

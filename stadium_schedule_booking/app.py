@@ -15,8 +15,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app.config["MAIL_SERVER"]='smtp.gmail.com'
 app.config["MAIL_PORT"]=465
-app.config["MAIL_USERNAME"]='spyjason123@gmail.com'
-app.config['MAIL_PASSWORD']='' #from settings change this before pushing to git                   
+app.config["MAIL_USERNAME"]='play.arena35@gmail.com'
+app.config['MAIL_PASSWORD']='' #from settings change this before pushing to git
 app.config['MAIL_USE_TLS']=False
 app.config['MAIL_USE_SSL']=True
 mail=Mail(app)
@@ -52,10 +52,12 @@ def login():
                 flash("Invalid credentials",category='error')
                 return render_template('login.html',form=form)
             session['user']=e
+            session['username'] = user['username']
             favs = user['favsports']
             print(favs)
             favsports = [ i.strip().capitalize() for i in favs.split(',')]
             print(favsports)
+            session['favsports'] = favsports
             
         except:
             flash("Couldnot establish connection with the database, please try after sometime",category='warning')
@@ -64,16 +66,54 @@ def login():
         else:
             if user['admin'] == 'yes':
                     return render_template('adminhomepage.html')
-        return render_template('userhome.html', sports=sports, favsports=favsports)
+        sp_limit = {'Football': 14, 'Cricket': 14, 'Hockey': 12, 'Rugby': 15, 'Basketball': 10, 'Tennis': 4,
+                    'Badminton': 4,
+                    'Archery': 4, 'Golf': 6}
+        return render_template('userhome.html', sports=sports, favsports=favsports, sp_limit=sp_limit)
 
     return render_template('login.html',form=form)
+
+
+@app.route('/userhome')
+def userhome():
+    conn= get_db_connection()
+    sports=conn.execute('select * from sports').fetchall()
+    favsports=session['favsports']
+    conn.close()
+    sp_limit = {'Football': 14, 'Cricket': 14, 'Hockey': 12, 'Rugby': 15, 'Basketball': 10, 'Tennis': 4, 'Badminton': 4,
+                'Archery': 4, 'Golf': 6}
+    return render_template('userhome.html', sports=sports, favsports=favsports, sp_limit=sp_limit)
+
+@app.route('/updatebooking', methods=('GET', 'POST'))
+def updatebooking():
+    sp = request.form.get('sp')
+    dt = request.form.get('dt')
+    tc = request.form.get('tc')
+    hc = request.form.get('hc')
+    sp_name = request.form.get('sp_name')
+    slotlist = request.form.getlist('slotlist[]')
+    code = ",".join(slotlist)
+    print("HERE")
+    print(session['user'])
+    msg = Message(subject='Booking Cofirmed!', sender='play.arena35@gmail.com', recipients=[session['user']])
+    msg.body = str(f"Your booking is confirmed.\nSport: {sp_name}\nTime: {code}\nTotal Cost: {tc}")
+    msg.html = render_template('confirmation.html', dt=dt, slotlist=slotlist, hc=hc, tc=tc, sp=sp, sp_name=sp_name,
+                               cnf=False)
+    mail.send(msg)
+
+    conn = get_db_connection()
+    conn.execute("INSERT INTO booking (sportsId,date,duration,'total cost','customer username',code) VALUES (?,?,?,?,?,?)",(sp,dt,len(slotlist),tc,session['username'],code))
+    conn.commit()
+    conn.close()
+    return ("nothing")
 
 @app.route('/logout', methods=('GET', 'POST'))
 def logout():
     #check user login 
     if "user" in session:
-        session.pop('user', None)
+        # session.pop('user', None)
         flash("Logged out successfully",category='success')
+        session.clear()
         return render_template('index.html')
     
     flash("User not logged in, please login first",category='warning')
@@ -139,27 +179,14 @@ def book():
 def confirmbooking():
     form=BookingForm()
     if request.method == "POST" and form.is_submitted():
-        print("HEREE")
         result= request.form
-        conn = get_db_connection()
-        p = request.form.get('date')
+        dt = request.form.get('date')
         slotlist = request.form.getlist('slot_list[]')
         hc = request.form.get('cost-per-hr')
         tc = request.form.get('form-total-cost')
-        print(p)
-        print(slotlist)
-        print(hc)
-        print(tc)
-
-        # conn.execute("INSERT INTO users (username,emailid,password,firstname,lastname,favsports,admin) VALUES (?,?,?,?,?,?,?)",(un,e,p,fn,ln,fs,'no'))
-        # sports = conn.execute('SELECT * FROM sports').fetchall()
-        # flash("Thank you for registering")
-        # favsports = [i.strip().capitalize() for i in fs.split(',')]
-        # conn.commit()
-        # conn.close()
-        # return render_template('userhome.html', sports=sports, favsports=favsports)
-
-        return render_template('confirmbooking.html', form=form, p=p, slotlist=slotlist, hc=hc, tc=tc)
+        sp = request.form.get('sport-id')
+        sp_name = request.form.get('sport-name')
+        return render_template('confirmation.html', form=form, dt=dt, slotlist=slotlist, hc=hc, tc=tc, sp=sp, sp_name=sp_name,cnf=True)
     return render_template('login.html', form=LoginForm())
 
 
@@ -182,7 +209,7 @@ def forgotpassword():
                 flash("Please enter your registered email id only",category='warning')
                 return render_template('forgotpassword.html',form=form)
         except:
-            flash("Couldnot establish connection with the database, please try after sometime",category='warning')
+            flash("Could not establish connection with the database, please try after sometime",category='warning')
         else:
             flash('A password reset email has been sent to your registered mail.',category='info')
             #email=request.form['email']
