@@ -34,3 +34,6 @@ class BookingForm(FlaskForm):
 
 class EditingForm(FlaskForm):
     submit = SubmitField('Proceed')
+
+class ChangePrices(FlaskForm):
+    submit = SubmitField('Proceed')

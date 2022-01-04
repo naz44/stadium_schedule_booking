@@ -33,3 +33,16 @@ create table booking(
     code TEXT,
     FOREIGN KEY(sportsId) REFERENCES sports(id)
 );
+
+DROP TABLE IF EXISTS maintenance;
+
+create table maintenance(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sportsId INTEGER,
+    date DATETIME,
+    duration INTEGER,
+    customer_username TEXT,
+    code TEXT,
+    comment TEXT,
+    FOREIGN KEY(sportsId) REFERENCES sports(id)
+);

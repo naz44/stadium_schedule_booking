@@ -5,7 +5,7 @@ from datetime import date
 import datetime
 import hashlib
 #from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, SignupForm, ForgotPasswordForm, ResetPasswordForm, BookingForm, EditingForm
+from forms import LoginForm, SignupForm, ForgotPasswordForm, ResetPasswordForm, BookingForm, EditingForm, ChangePrices
 from flask_mail import Mail, Message
 from random import randint
 
@@ -71,10 +71,14 @@ def login():
 def logout():
     #check user login 
     if "user" in session:
-        session.pop('user', None)
-        session.pop('email',None)
-        session.pop('sports',None)
-        session.pop('favsports',None)
+        # session.pop('user', None)
+        # session.pop('email',None)
+        # session.pop('sports',None)
+        # session.pop('favsports',None)
+        # print(session)
+        # Clear all of the previously set session variables and then redirect to the index page
+        session.clear()
+        # print(session)
         flash("Logged out successfully",category='success')
         return render_template('index.html')
     
@@ -90,8 +94,6 @@ def register():
     form=SignupForm()
     if form.is_submitted():
         result= request.form 
-        # connection = sqlite3.connect('database.db')
-        # cur = connection.cursor()
         try:
             conn = get_db_connection()
             p = request.form.get('password')
@@ -168,8 +170,6 @@ def resetpassword():
             if confirmPassword == password and password != "":
                 #update the table 
                 conn.execute('UPDATE users SET password = ? WHERE emailid = ?',(str(hashlib.md5(password.encode()).hexdigest()),session['email']))
-                # flash('Password reset done successfully.',category='success')
-                # return redirect(url_for("login"))
             elif password == "" and confirmPassword == "":
                 return render_template('resetpassword.html',form =form, message = "Need to give a password")
             else:
@@ -221,8 +221,11 @@ def book():
         dates.append([datestr, dt.strftime("%A") if i>0 else "Today"])
         #print(datestr)
         cur_date_bookings = conn.execute('SELECT code FROM booking WHERE sportsid = (SELECT id from sports WHERE name = ?) and date = ?', (sport, datestr)).fetchall()
+        cur_date_bookings_maintenance = conn.execute('SELECT code FROM maintenance WHERE sportsid = (SELECT id from sports WHERE name = ?) and date = ?', (sport, datestr)).fetchall()
         booking_list = []
         for booking in cur_date_bookings:
+            booking_list.extend([j.strip() for j in booking['code'].split(',')])
+        for booking in cur_date_bookings_maintenance:
             booking_list.extend([j.strip() for j in booking['code'].split(',')])
         availability[datestr] = booking_list
     sp = sport
@@ -238,14 +241,21 @@ def confirmbooking():
         print("HEREE")
         result= request.form
         conn = get_db_connection()
-        p = request.form.get('date')
-        slotlist = request.form.getlist('slot_list[]')
-        hc = request.form.get('cost-per-hr')
-        tc = request.form.get('form-total-cost')
-        print(p)
-        print(slotlist)
-        print(hc)
-        print(tc)
+        sp = request.form.get('sp')
+        dt = request.form.get('dt')
+        tc = request.form.get('tc')
+        hc = request.form.get('hc')
+        sp_name = request.form.get('sp_name')
+        slotlist = request.form.getlist('slotlist[]')
+        code = ",".join(slotlist)
+        # print(p)
+        # print(slotlist)
+        # print(hc)
+        # print(tc)
+        conn.execute("INSERT INTO booking (sportsId,date,duration,total_cost,customer_username,code) VALUES (?,?,?,?,?,?)",
+        (sp,dt,len(slotlist),tc,session['username'],code))
+        conn.commit()
+        conn.close()
         return render_template('confirmbooking.html', form=form, p=p, slotlist=slotlist, hc=hc, tc=tc)
     return render_template('login.html', form=LoginForm())
 
@@ -267,18 +277,21 @@ def edit():
     dates = [] # To store next 7 days
     availability = {}   # availability = {"31/12/21": [11,12,21], "01/01/22": [2,3,18,19]}
     today = date.today()
+    
     conn = get_db_connection()
-
     for i in range(7):
         dt = today+datetime.timedelta(days=i)
         datestr = str(dt.strftime("%d/%m/%Y"))
         dates.append([datestr, dt.strftime("%A") if i>0 else "Today"])
         #print(datestr)
         cur_date_bookings = conn.execute('SELECT code FROM booking WHERE sportsid = (SELECT id from sports WHERE name = ?) and date = ?', (sport, datestr)).fetchall()
+        cur_date_bookings_maintenance = conn.execute('SELECT code FROM maintenance WHERE sportsid = (SELECT id from sports WHERE name = ?) and date = ?', (sport, datestr)).fetchall()
         booking_list = []
         for booking in cur_date_bookings:
             booking_list.extend([j.strip() for j in booking['code'].split(',')])
         availability[datestr] = booking_list
+        for booking in cur_date_bookings_maintenance:
+            booking_list.extend([j.strip() for j in booking['code'].split(',')])
     sp = sport
 
     sportsdata = conn.execute('SELECT * FROM sports WHERE name = ?',(sp,)).fetchone()
@@ -297,13 +310,15 @@ def maintenance():
         result= request.form
         conn = get_db_connection()
         p = request.form.get('date')
-        print(p)
+        # print(p)
         slotlist = request.form.getlist('slot_list[]')
-        print(slotlist)
+        # print(slotlist)
         s = request.form.get('sport-id')
-        print(type(s))
-        print(type(','.join(slotlist)))
-        conn.execute('INSERT INTO booking (sportsId,date,duration,total_cost,customer_username,code) values (?,?,?,?,?,?)',(int(session['edit_id']),p,len(slotlist),0,'admin',','.join(slotlist)))
+        # print(type(s))
+        # print(type(','.join(slotlist)))
+        comment_maintenance=request.form.get('comment')
+        conn.execute('INSERT INTO maintenance (sportsId,date,duration,comment,customer_username,code) values (?,?,?,?,?,?)',(int(session['edit_id']),p,len(slotlist),comment_maintenance,'admin',','.join(slotlist)))
+        # conn.execute('INSERT INTO booking (sportsId,date,duration,total_cost,customer_username,code) values (?,?,?,?,?,?)',(int(session['edit_id']),p,len(slotlist),0,'admin',','.join(slotlist)))
         session.pop('edit_id',None)
         conn.commit()
         conn.close()
@@ -311,6 +326,25 @@ def maintenance():
         return render_template('adminhomepage.html', form=form, p=p)
     return render_template('login.html', form=LoginForm())
 
+@app.route('/changeprices', methods=['GET','POST'])
+def changeprices():
+    # fetches all the sports from sports table and displays on changeprices.html. After submit, it updates the the price.
+    form = ChangePrices()
+    if form.is_submitted():
+        sport = request.form.get('sports')
+        price = request.form.get('price')
+        conn=get_db_connection()
+        conn.execute('UPDATE sports SET cost = ? WHERE name = ?', (int(price),sport))
+        conn.commit()
+        conn.close()
+        flash("Price has been updated", category='success')
+        return redirect(url_for('adminhomepage'))
+    conn=get_db_connection()
+    query = conn.execute('select name from sports').fetchall()
+    conn.commit()
+    conn.close()
+    print(query)
+    return render_template("changeprices.html",query=query, form = form)
 
 if __name__ == "__main__":
     app.run(debug=True)
