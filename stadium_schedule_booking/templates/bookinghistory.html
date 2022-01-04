@@ -1,3 +1,5 @@
+{% extends 'base.html' %}
+{%block content%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -118,7 +120,25 @@ table.table td a:hover {
 
 </style>
 </head>
-
+<nav class="navbar navbar-expand-md navbar-light bg-light">
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+	<div class="collapse navbar-collapse" id="navbarNav">
+		<ul class="navbar-nav">
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav">
+				<li class="nav-item">
+					<a class="nav-link" href="{{url_for('adminhomepage')}}"><h6>Goto Home</h6></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{url_for('logout')}}"><h6>Logout</h6></a>
+				</li>
+				</ul>
+			</div>
+		</ul>
+	</div>
+</nav>
 <body>
 <div class="container-xl">
 	<div class="table-responsive">
@@ -133,16 +153,25 @@ table.table td a:hover {
 			<table class="table table-striped table-hover">
 				<thead>
 					<tr>
-						<th>Name</th>
-						<th>Email</th>
+						<th>Username</th>
 						<th>Sports</th>
-						<th>Phone</th>
-                        <th>Time</th>
-						<th>Cost</th>
+						<th>Date</th>
+                        <th>Total duration(in hrs)</th>
+						<th>Total Cost(in Rs)</th>
 					</tr>
 				</thead>
 				<tbody>
+					{% for row in data %}    
 					<tr>
+						<td>{{row[0]}}</td>
+						<td>{{row[1]}}</td>
+						<td>{{row[2]}}</td>
+						<td>{{row[3]}}</td>
+						<td>{{row[4]}}</td>
+						<!-- <td>{{row[5]}}</td> -->
+					</tr>
+					{% endfor %}
+					<!-- <tr>
 						
 						<td>Thomas Hardy</td>
 						<td>thomashardy@mail.com</td>
@@ -182,12 +211,12 @@ table.table td a:hover {
 						<td>9811567999</td>
                         <td>14:00 - 16:00</td>
                         <td>880</td>
-					</tr> 
+					</tr>  -->
 				</tbody>
 			</table>
 			<div class="clearfix">
-				<div class="hint-text">Showing <b>5</b> out of <b>25</b> entries</div>
-				<ul class="pagination">
+				<div class="hint-text">Showing all the entries</div>
+				<!-- <ul class="pagination">
 					<li class="page-item disabled"><a href="#">Previous</a></li>
 					<li class="page-item active"><a href="#" class="page-link">1</a></li>
 					<li class="page-item"><a href="#" class="page-link">2</a></li>
@@ -195,7 +224,7 @@ table.table td a:hover {
 					<li class="page-item"><a href="#" class="page-link">4</a></li>
 					<li class="page-item"><a href="#" class="page-link">5</a></li>
 					<li class="page-item"><a href="#" class="page-link">Next</a></li>
-				</ul>
+				</ul> -->
 			</div>
 		</div>
 	</div>        
@@ -203,3 +232,4 @@ table.table td a:hover {
 
 </body>
 </html>
+{% endblock %}

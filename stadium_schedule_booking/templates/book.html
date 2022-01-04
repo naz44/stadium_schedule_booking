@@ -109,7 +109,25 @@
 </style>
 </head>
 <body>
-
+<nav class="navbar navbar-expand-md navbar-light bg-light">
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+	<div class="collapse navbar-collapse" id="navbarNav">
+		<ul class="navbar-nav">
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav">
+				<li class="nav-item">
+					<a class="nav-link" href="{{url_for('userhome')}}"><h6>Goto Home</h6></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{url_for('logout')}}"><h6>Logout</h6></a>
+				</li>
+				</ul>
+			</div>
+		</ul>
+	</div>
+</nav>
 <form method="post" action="{{ url_for('confirmbooking') }}" onsubmit="return verifyvalid()">
 <h2 style="margin-left: 10px;"><b>SELECT DATE</b></h2>
     <div class="radio date-options-container">
