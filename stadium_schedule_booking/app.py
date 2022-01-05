@@ -40,10 +40,15 @@ def viewmaintenance():
     if session['usertype'] == 'user':
         return "Access Denied!!"
     conn = get_db_connection()
-    #displays all bookings in desc order of date
-    filtered = conn.execute('SELECT * from maintenance').fetchall()
-    conn.close()
-    return render_template('viewmaintenance.html',data=filtered)
+    try:
+        #displays all bookings in desc order of date
+        filtered = conn.execute('SELECT * from maintenance').fetchall()
+        return render_template('viewmaintenance.html',data=filtered)
+    except:
+        return render_template('viewmaintenance.html')
+    finally:
+        conn.close()
+
 
 @app.route('/login', methods=('GET', 'POST'))
 def login():
@@ -51,7 +56,7 @@ def login():
     #according to the user(admin/customer) display the homepage
     form=LoginForm()
     if form.is_submitted():
-        result= request.form 
+        result= request.form
         try:
             conn = get_db_connection()
             p = request.form.get('password')
@@ -85,7 +90,10 @@ def login():
             sp_limit = {'Football': 14, 'Cricket': 14, 'Hockey': 12, 'Rugby': 15, 'Basketball': 10, 'Tennis': 4,
                             'Badminton': 4,
                             'Archery': 4, 'Golf': 6}
-        return render_template('userhome.html', sports=sports, favsports=favsports, sp_limit=sp_limit)
+            actualsports = list(sp_limit.keys())
+
+
+        return render_template('userhome.html', sports=sports, favsports=favsports, sp_limit=sp_limit, actualsports=actualsports)
 
     return render_template('login.html',form=form)
 
@@ -98,7 +106,9 @@ def userhome():
     conn.close()
     sp_limit = {'Football': 14, 'Cricket': 14, 'Hockey': 12, 'Rugby': 15, 'Basketball': 10, 'Tennis': 4, 'Badminton': 4,
                 'Archery': 4, 'Golf': 6}
-    return render_template('userhome.html', sports=sports, favsports=favsports, sp_limit=sp_limit)
+    actualsports = list(sp_limit.keys())
+
+    return render_template('userhome.html', sports=sports, favsports=favsports, sp_limit=sp_limit, actualsports=actualsports)
 
 @app.route('/updatebooking', methods=('GET', 'POST'))
 def updatebooking():
@@ -129,12 +139,12 @@ def updatebooking():
 
 @app.route('/logout', methods=('GET', 'POST'))
 def logout():
-    #check user login 
+    #check user login
     if "user" in session:
         flash("Logged out successfully",category='success')
         session.clear()
         return render_template('index.html')
-    
+
     flash("User not logged in, please login first",category='warning')
     #return render_template('login.html',form=LoginForm())#error
     return redirect(url_for("login"))
@@ -142,11 +152,11 @@ def logout():
 
 @app.route('/register', methods=('GET', 'POST'))
 def register():
-    #get details from register page 
+    #get details from register page
     # and insert into database
     form=SignupForm()
     if form.is_submitted():
-        result= request.form 
+        result= request.form
         try:
             conn = get_db_connection()
             p = request.form.get('password')
@@ -171,13 +181,13 @@ def register():
 
 @app.route('/forgotpassword', methods=('GET', 'POST'))
 def forgotpassword():
-    #get email from dbase 
+    #get email from dbase
     #and send reset password otp to user via mail
-    #validate otp 
+    #validate otp
     #and redirect to reset password,update in dbase
     form=ForgotPasswordForm()
     if form.is_submitted():
-        result= request.form 
+        result= request.form
         try:
             conn = get_db_connection()
             e = request.form.get('email')
@@ -215,13 +225,13 @@ def validate():
 def resetpassword():
     form=ResetPasswordForm()
     if form.is_submitted():
-        result= request.form 
+        result= request.form
         try:
             conn = get_db_connection()
             password = request.form.get('password')
             confirmPassword = request.form.get('password_confirm')
             if confirmPassword == password and password != "":
-                #update the table 
+                #update the table
                 conn.execute('UPDATE users SET password = ? WHERE emailid = ?',(str(hashlib.md5(password.encode()).hexdigest()),session['email']))
             elif password == "" and confirmPassword == "":
                 return render_template('resetpassword.html',form =form, message = "Need to give a password")
@@ -243,18 +253,29 @@ def bookinghistory():
     if session['usertype'] == 'user':
         return "Access Denied!!"
     conn = get_db_connection()
-    #displays all bookings in desc order of date
-    filtered = conn.execute('SELECT b."customer username",s.name,b.date,b.duration,b."total cost",b.code FROM booking b,sports s where b.sportsid=s.id order by b.date desc').fetchall()
-    conn.close()
-    return render_template('bookinghistory.html',data=filtered)
+    try:
+        #displays all bookings in desc order of date
+        filtered = conn.execute('SELECT b."customer username",s.name,b.date,b.duration,b."total cost",b.code FROM booking b,sports s where b.sportsid=s.id order by b.date desc').fetchall()
+
+        return render_template('bookinghistory.html',data=filtered)
+    except:
+        return render_template('bookinghistory.html')
+    finally:
+        conn.close()
 
 @app.route('/userbookinghistory')
+
 def userbookinghistory():
     conn = get_db_connection()
     #displays all bookings in desc order of date
-    filtered = conn.execute('SELECT b."customer username",s.name,b.date,b.duration,b."total cost",b.code FROM booking b,sports s where b.sportsid=s.id and  b."customer username" = ? order by b.date desc ', (session['username'],)).fetchall()
-    conn.close()
-    return render_template('bookings.html',data=filtered)
+    try:
+        filtered = conn.execute('SELECT b."customer username",s.name,b.date,b.duration,b."total cost",b.code FROM booking b,sports s where b.sportsid=s.id and  b."customer username" = ? order by b.date desc ', (session['username'],)).fetchall()
+
+        return render_template('bookings.html',data=filtered)
+    except:
+        return render_template('bookings.html')
+    finally:
+        conn.close()
 
 @app.route('/adminhomepage')
 def adminhomepage():
@@ -263,7 +284,7 @@ def adminhomepage():
     return render_template('adminhomepage.html')
 
 @app.route('/homepage')
-def homepage(): 
+def homepage():
     conn= get_db_connection()
     sports=conn.execute('select * from sports').fetchall()
     favsports=session['favsports']
@@ -332,7 +353,7 @@ def editsports():
                 'Badminton': 4,
                 'Archery': 4, 'Golf': 6}
     return render_template('editsports.html', sports=sports, sp_limit=sp_limit)
-    
+
 
 @app.route('/edit', methods=('GET', 'POST'))
 def edit():
@@ -344,7 +365,7 @@ def edit():
     dates = [] # To store next 7 days
     availability = {}   # availability = {"31/12/21": [11,12,21], "01/01/22": [2,3,18,19]}
     today = date.today()
-    
+
     conn = get_db_connection()
     for i in range(7):
         dt = today+datetime.timedelta(days=i)
@@ -356,9 +377,10 @@ def edit():
         booking_list = []
         for booking in cur_date_bookings:
             booking_list.extend([j.strip() for j in booking['code'].split(',')])
-        availability[datestr] = booking_list
+
         for booking in cur_date_bookings_maintenance:
             booking_list.extend([j.strip() for j in booking['code'].split(',')])
+        availability[datestr] = booking_list
     sp = sport
 
     sportsdata = conn.execute('SELECT * FROM sports WHERE name = ?',(sp,)).fetchone()
