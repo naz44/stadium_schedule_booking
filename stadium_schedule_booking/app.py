@@ -9,7 +9,7 @@ import hashlib
 from forms import LoginForm, SignupForm, ForgotPasswordForm, ResetPasswordForm, BookingForm, EditingForm, ChangePrices
 from flask_mail import Mail, Message
 from random import randint
-from creds import email_password
+from creds import email_password, email_id
 from timecal import timecal
 
 app = Flask(__name__)
@@ -17,8 +17,8 @@ app.config['SECRET_KEY'] = 'stadium'
 
 app.config["MAIL_SERVER"]='smtp.gmail.com'
 app.config["MAIL_PORT"]=465
-app.config["MAIL_USERNAME"]='play.arena35@gmail.com'
-app.config['MAIL_PASSWORD']=email_password #from settings change this before pushing to git
+app.config["MAIL_USERNAME"]=email_id # provide in creds.py
+app.config['MAIL_PASSWORD']=email_password # provide in creds.py
 app.config['MAIL_USE_TLS']=False
 app.config['MAIL_USE_SSL']=True
 mail=Mail(app)
@@ -128,7 +128,7 @@ def updatebooking():
     conn.execute("INSERT INTO booking (sportsId,date,duration,'total cost','customer username',code) VALUES (?,?,?,?,?,?)",(sp,dt,len(slotlist),tc,session['username'],code))
     conn.commit()
     conn.close()
-    msg = Message(subject='Booking Confirmed!', sender='play.arena35@gmail.com', recipients=[session['user']])
+    msg = Message(subject='Booking Confirmed!', sender=email_id, recipients=[session['user']])
     msg.body = str(f"Your booking is confirmed.\nSport: {sp_name}\nTime: {slotstr}\nTotal Cost: {tc}")
 
     msg.html = render_template('confirmation.html', slotlist=slotlist, slotstr=slotstr, dt=dt, hc=hc, tc=tc, sp=sp,
@@ -206,7 +206,7 @@ def forgotpassword():
             session['otp']=otp
             session['email']=e
             #print(session['otp'])
-            msg=Message(subject='OTP',sender='play.arena35@gmail.com',recipients=[e])
+            msg=Message(subject='OTP',sender=email_id,recipients=[e])
             msg.body=str(otp)
             mail.send(msg)
             return render_template('verify.html')
