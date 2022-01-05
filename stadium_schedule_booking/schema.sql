@@ -28,8 +28,8 @@ create table booking(
     sportsId INTEGER,
     date DATETIME,
     duration INTEGER,
-    total_cost DECIMAL(7,2),
-    customer_username TEXT,
+    total cost DECIMAL(7,2),
+    customer username TEXT,
     code TEXT,
     FOREIGN KEY(sportsId) REFERENCES sports(id)
 );
